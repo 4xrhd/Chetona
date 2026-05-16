@@ -1,0 +1,18 @@
+aromvho() {
+    prodorshon("Enter your name:");
+    dhoro name = grohon_shobdo();
+    
+    prodorshon("Enter your age:");
+    dhoro age = grohon_shonkhya();
+    
+    prodorshon("Hello,");
+    prodorshon(name);
+    
+    shorto (age >= 18) {
+        prodorshon("You are an adult.");
+    } onno_thay {
+        prodorshon("You are a minor.");
+    }
+    
+    shomapti();
+}

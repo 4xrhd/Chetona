@@ -1,0 +1,23 @@
+aromvho() {
+    prodorshon("--- Simple Calculator ---");
+    
+    prodorshon("Enter first number:");
+    dhoro num1 = grohon_shonkhya();
+    
+    prodorshon("Enter second number:");
+    dhoro num2 = grohon_shonkhya();
+    
+    prodorshon("Addition:");
+    prodorshon(shonkolon(num1, num2));
+    
+    prodorshon("Subtraction:");
+    prodorshon(biyojon(num1, num2));
+    
+    prodorshon("Multiplication:");
+    prodorshon(gunon(num1, num2));
+    
+    prodorshon("Division:");
+    prodorshon(vabhon(num1, num2));
+    
+    shomapti();
+}

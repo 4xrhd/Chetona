@@ -1,0 +1,4 @@
+aromvho() {
+    prodorshon("Hello World in Bengali!");
+    shomapti();
+}

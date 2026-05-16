@@ -1,0 +1,14 @@
+aromvho() {
+    prodorshon("Enter a number:");
+    dhoro num = grohon_shonkhya();
+    
+    shorto (num > 0) {
+        prodorshon("Positive number");
+    } natuva (num < 0) {
+        prodorshon("Negative number");
+    } onno_thay {
+        prodorshon("Zero");
+    }
+    
+    shomapti();
+}

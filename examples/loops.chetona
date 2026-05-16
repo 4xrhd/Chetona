@@ -1,0 +1,15 @@
+aromvho() {
+    prodorshon("While loop:");
+    dhoro i = 1;
+    ghurnon (i <= 5) {
+        prodorshon(i);
+        i = i + 1;
+    }
+    
+    prodorshon("For loop:");
+    jotokhon (dhoro j = 1; j <= 5; j = j + 1) {
+        prodorshon(j);
+    }
+    
+    shomapti();
+}

@@ -1,0 +1,15 @@
+aromvho() {
+    prodorshon("--- Multiplication Table ---");
+    
+    prodorshon("Enter a number:");
+    dhoro num = grohon_shonkhya();
+    
+    prodorshon("Table for:");
+    prodorshon(num);
+    
+    jotokhon (dhoro i = 1; i <= 10; i = i + 1) {
+        prodorshon(gunon(num, i));
+    }
+    
+    shomapti();
+}

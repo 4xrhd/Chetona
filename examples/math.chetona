@@ -1,0 +1,23 @@
+aromvho() {
+    dhoro a = 10;
+    dhoro b = 20;
+    
+    prodorshon("a =");
+    prodorshon(a);
+    prodorshon("b =");
+    prodorshon(b);
+    
+    prodorshon("Sum:");
+    prodorshon(shonkolon(a, b));
+    
+    prodorshon("Difference:");
+    prodorshon(biyojon(b, a));
+    
+    prodorshon("Product:");
+    prodorshon(gunon(a, b));
+    
+    prodorshon("Quotient:");
+    prodorshon(vabhon(b, a));
+    
+    shomapti();
+}

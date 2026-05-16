@@ -1,0 +1,30 @@
+aromvho() {
+    prodorshon("--- CHETONA Porikkha Result System ---");
+    
+    prodorshon("Apnar marks likhun (0-100):");
+    dhoro marks = grohon_shonkhya();
+    
+    shorto (marks >= 90) {
+        prodorshon("Grade: A+");
+        prodorshon("Very Good. Apni bhalo result korechen!");
+    }
+    nahole (marks >= 80) {
+        prodorshon("Grade: A");
+        prodorshon("Good! chaliye jan.");
+    }
+    nahole (marks >= 70) {
+        prodorshon("Grade: B");
+        prodorshon("Valo korechen, kintu aro valo kora shombhob.");
+    }
+    nahole (marks >= 60) {
+        prodorshon("Grade: C");
+        prodorshon("Pass, kintu porashonay aro monojog baran.");
+    }
+    onno_thay {
+        prodorshon("Grade: F");
+        prodorshon("Hotasha hoben na!.");
+    }
+    
+    prodorshon("Dhonnobad!");
+    shomapti();
+}
