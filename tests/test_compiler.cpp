@@ -1,8 +1,10 @@
 #include <iostream>
 #include <cassert>
+#include <string>
 #include "../include/lexer.hpp"
 #include "../include/parser.hpp"
 #include "../include/codegen.hpp"
+#include "../include/symbol_table.hpp"
 
 using namespace chetona;
 
@@ -68,6 +70,17 @@ void testSymbolTable() {
     
     SymbolTable table;
     
+    // Test default constructor
+    Symbol s;
+    assert(s.name == "");
+    assert(s.isInitialized == false);
+    
+    // Test parameterized constructor
+    Symbol s2("x", "auto", 0);
+    assert(s2.name == "x");
+    assert(s2.type == "auto");
+    assert(s2.scope == 0);
+    
     // Test scope management
     table.enterScope();
     assert(table.getCurrentScope() == 1);
@@ -83,14 +96,50 @@ void testSymbolTable() {
     std::cout << "Symbol Table tests passed!" << std::endl;
 }
 
+void testFullPipeline() {
+    std::cout << "Testing Full Pipeline..." << std::endl;
+    
+    // Test a more complex program
+    std::string source = R"(
+        aromvho() {
+            dhoro x = 10;
+            prodorshon(x);
+            shomapti();
+        }
+    )";
+    
+    Lexer lexer(source);
+    auto tokens = lexer.tokenize();
+    assert(tokens.size() > 0);
+    
+    Parser parser(tokens);
+    auto ast = parser.parse();
+    assert(ast != nullptr);
+    
+    CodeGenerator codegen;
+    std::string code = codegen.generate(ast);
+    
+    assert(code.find("auto x = 10") != std::string::npos);
+    assert(code.find("std::cout") != std::string::npos);
+    
+    std::cout << "Full Pipeline tests passed!" << std::endl;
+}
+
 int main() {
     std::cout << "\n=== Chetona Compiler Tests ===\n" << std::endl;
     
-    testLexer();
-    testParser();
-    testCodeGenerator();
-    testSymbolTable();
+    try {
+        testLexer();
+        testParser();
+        testCodeGenerator();
+        testSymbolTable();
+        testFullPipeline();
+        
+        std::cout << "\nAll tests passed!\n" << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << "\nTest failed with error: " << e.what() << std::endl;
+        return 1;
+    }
     
-    std::cout << "\nAll tests passed!\n" << std::endl;
     return 0;
 }

@@ -1,104 +1,81 @@
 # Chetona Compiler v2.0
 
-A Bengali-based programming language compiler that translates Chetona code to C++.
+Chetona is a Bengali-keyword programming language that compiles `.chetona` source into C++.
 
-## Overview
+## What this project includes
 
-Chetona is a domain-specific language (DSL) that uses Bengali keywords to make programming more accessible to Bengali speakers. This compiler translates Chetona source code into standard C++.
+- Main compiler binary: `build/chetona`
+- Flex-based standalone lexer binary: `build/chetona_lexer`
+- End-to-end pipeline: Lexer -> Parser -> AST -> C++ Code Generator
+- Sample programs in `examples/`
+- Test suite in `tests/test_compiler.cpp`
+- Build systems for Linux/macOS/Windows (`Makefile`, `build.sh`, `build.bat`)
 
-## Features
+## Repository layout
 
-- **Bengali Keywords**: Write code using familiar Bengali words
-- **Full Compiler Pipeline**: Lexer → Parser → AST → Code Generator
-- **C++ Output**: Generates clean, compilable C++ code
-- **Symbol Table**: Tracks variable declarations and scopes
-- **Multiple Output Options**: Tokens, AST, or compiled executable
-
-## Project Structure
-
-```
+```text
 chetona-v2/
-├── include/           # Header files
-│   ├── chetona.hpp    # Core definitions and tokens
-│   ├── lexer.hpp      # Lexical analyzer
-│   ├── parser.hpp     # Parser and AST
-│   ├── codegen.hpp    # Code generator
-│   └── symbol_table.hpp
 ├── src/
-│   └── main.cpp       # Compiler entry point
-├── examples/          # Sample Chetona programs
-├── tests/             # Test files
-├── build/             # Build output
-├── docs/              # Documentation
-├── chetona.l          # Flex lexer definition
-└── Makefile           # Build configuration
+│   └── main.cpp                 # Compiler CLI entry point
+├── include/
+│   ├── chetona.hpp              # Tokens, AST nodes, compatibility macros
+│   ├── lexer.hpp                # Handwritten lexer
+│   ├── parser.hpp               # Recursive-descent parser
+│   ├── codegen.hpp              # C++ code generator
+│   └── symbol_table.hpp         # Symbol table utility
+├── tests/
+│   └── test_compiler.cpp        # Unit/integration style tests
+├── examples/                    # Example .chetona programs
+├── docs/                        # Extra guides/reference
+├── chetona.l                    # Flex lexer definition
+├── Makefile                     # Cross-platform build targets
+├── build.sh                     # Linux/macOS build script
+└── build.bat                    # Windows build script
 ```
 
-## Quick Start
+## Requirements
 
-### Build
+- `g++` with C++11 support
+- `flex` (for `chetona_lexer`)
+- `make` (if using the Makefile)
+
+Ubuntu/Debian:
+
+```bash
+sudo apt-get update
+sudo apt-get install build-essential flex make
+```
+
+## Quick start
 
 ```bash
 make
-```
-
-### Compile a Chetona file
-
-```bash
-./build/chetona examples/hello.chetona -o output.cpp
-```
-
-### Compile and run
-
-```bash
 ./build/chetona examples/hello.chetona -o output.cpp -c
 ./output
 ```
 
-### Run the Flex lexer
+## Build commands
+
+Using `Makefile`:
 
 ```bash
-./build/chetona_lexer examples/hello.chetona
+make                # compiler + flex lexer
+make compiler       # only compiler
+make lexer          # only flex lexer
+make test           # build and run tests
+make clean          # remove build artifacts
 ```
 
-## Language Reference
+Using scripts:
 
-### Keywords
+- Linux/macOS: `./build.sh <target>`
+- Windows: `build.bat <target>`
 
-| Bengali | English | Description |
-| :--- | :--- | :--- |
-| `aromvho()` | `int main()` | Program entry |
-| `shomapti()` | `return 0` | Program exit |
-| `dhoro` | `auto` | Variable declaration |
-| `var` | `auto` | Variable declaration |
-| `shorto` | `if` | Conditional |
-| `natuva` | `else if` | Else if |
-| `nahole` | `else if` | Else if (alt) |
-| `onno_thay` | `else` | Else |
-| `ghurnon` | `while` | While loop |
-| `jotokhon` | `for` | For loop |
-| `shotto` | `true` | Boolean true |
-| `mithya` | `false` | Boolean false |
+Common script targets: `all`, `compiler`, `lexer`, `test`, `examples`, `compile`, `lex`, `run`, `clean`.
 
-### Functions
+## Compiler CLI
 
-| Bengali | Description |
-| :--- | :--- |
-| `shonkolon(a, b)` | Addition (a + b) |
-| `biyojon(a, b)` | Subtraction (a - b) |
-| `gunon(a, b)` | Multiplication (a * b) |
-| `vabhon(a, b)` | Division (a / b) |
-| `mod(a, b)` | Modulo (a % b) |
-| `shomota(a, b)` | Equal (a == b) |
-| `boro(a, b)` | Greater (a > b) |
-| `choto(a, b)` | Less (a < b) |
-| `prodorshon(x)` | Print to console |
-| `grohon_shobdo()` | Read string input |
-| `grohon_shonkhya()` | Read number input |
-
-## Compiler Options
-
-```
+```text
 Usage: chetona <input.chetona> [options]
 
 Options:
@@ -106,70 +83,88 @@ Options:
   -t           Print tokens after lexing
   -a           Print AST after parsing
   -s           Print symbol table
-  -c           Compile to executable (requires g++)
+  -c           Compile generated C++ to executable (requires g++)
   -h, --help   Show help message
 ```
 
+Examples:
+
+```bash
+./build/chetona examples/loops.chetona -o loops.cpp
+./build/chetona examples/math.chetona -t -a
+./build/chetona examples/hello.chetona -o hello.cpp -c
+```
+
+## Language snapshot
+
+Program entry/exit:
+
+- `aromvho() { ... }` -> `int main() { ... }`
+- `shomapti();` -> `return 0;`
+
+Variables:
+
+- `dhoro x = 10;`
+- `var name = "abc";`
+
+Control flow:
+
+- `shorto (...) { ... }`
+- `natuva (...) { ... }` / `nahole (...) { ... }`
+- `onno_thay { ... }`
+- `ghurnon (...) { ... }` (while)
+- `jotokhon (...) { ... }` (for)
+
+Booleans:
+
+- `shotto`, `mithya`
+
+I/O and built-ins:
+
+- `prodorshon(x)`
+- `grohon_shobdo()`
+- `grohon_shonkhya()`
+- `shonkolon(a,b)`, `biyojon(a,b)`, `gunon(a,b)`, `vabhon(a,b)`, `mod(a,b)`
+- `shomota(a,b)`, `boro(a,b)`, `choto(a,b)`
+
 ## Example
 
-### Chetona code:
+Chetona:
 
 ```chetona
 aromvho() {
-    prodorshon("Hello World in Bengali!");
+    dhoro x = 5;
+    dhoro y = shonkolon(x, 3);
+    shorto (boro(y, 6)) {
+        prodorshon("y is greater than 6");
+    } onno_thay {
+        prodorshon("y is 6 or less");
+    }
     shomapti();
 }
 ```
 
-### Generated C++ code:
-
-```cpp
-#include <iostream>
-#include <string>
-
-inline std::string grohon_shobdo() {
-    std::string s;
-    std::cin >> s;
-    return s;
-}
-
-inline double grohon_shonkhya() {
-    double d;
-    std::cin >> d;
-    return d;
-}
-
-int main() {
-    std::cout << "Hello World in Bengali!" << std::endl;
-    return 0;
-}
-```
-
-## Building from Source
-
-### Prerequisites
-
-- g++ (C++11 support)
-- Flex
-- Make
-
-### Install on Ubuntu/Debian
-
-```bash
-sudo apt-get install build-essential flex
-```
-
-### Build
-
-```bash
-make
-```
-
-### Run tests
+## Testing
 
 ```bash
 make test
 ```
+
+Test coverage currently validates lexer tokenization, parser output, code generation, symbol table basics, and full pipeline sanity.
+
+## Current limitations (important)
+
+- The parser accepts only `aromvho()` as a top-level function.
+- `prodorshon(...)` supports one expression argument.
+- String literal generation is currently fragile in some cases (lexer stores string content without quotes).
+- `-s` prints an empty/default symbol table instance; semantic population is not yet integrated into parsing/codegen.
+- `chetona_lexer` (Flex) is a standalone token-dump utility and is separate from the compiler's handwritten lexer.
+
+## Extra docs
+
+- `docs/building.md`
+- `docs/language-reference.md`
+- `docs/compiler-guide.md`
 
 ## License
 

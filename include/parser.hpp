@@ -63,7 +63,6 @@ private:
     std::shared_ptr<ASTNode> parsePrimary();
     std::shared_ptr<ASTNode> parseComparison();
     std::shared_ptr<ASTNode> parseEquality();
-    std::shared_ptr<ASTNode> parseAssignment();
     std::shared_ptr<ASTNode> parseStatement();
     std::shared_ptr<ASTNode> parseBlock();
     std::shared_ptr<ASTNode> parseIfStatement();
@@ -71,7 +70,6 @@ private:
     std::shared_ptr<ASTNode> parseForLoop();
     std::shared_ptr<ASTNode> parseVariableDeclaration();
     std::shared_ptr<ASTNode> parsePrintStatement();
-    std::shared_ptr<ASTNode> parseFunctionCall();
     std::shared_ptr<ASTNode> parseMainFunction();
 
 public:
@@ -140,7 +138,17 @@ std::shared_ptr<ASTNode> Parser::parseStatement() {
         return std::make_shared<ASTNode>(NodeType::LITERAL, "return");
     }
     if (check(TokenType::IDENTIFIER)) {
-        return parseAssignment();
+        // Parse assignment
+        Token name = advance();
+        expect(TokenType::ASSIGN, "Expected '=' after variable name");
+        
+        // Parse expression
+        auto expr = parseExpression();
+        expect(TokenType::SEMICOLON, "Expected ';' after assignment");
+        
+        auto node = std::make_shared<ASTNode>(NodeType::ASSIGNMENT, name.value);
+        node->children.push_back(expr);
+        return node;
     }
     
     throw ParserError("Unexpected token: " + peek().value, peek().line, peek().column);
@@ -158,21 +166,6 @@ std::shared_ptr<ASTNode> Parser::parseVariableDeclaration() {
     expect(TokenType::SEMICOLON, "Expected ';' after variable declaration");
     
     auto node = std::make_shared<ASTNode>(NodeType::VARIABLE_DECLARATION, name.value);
-    node->children.push_back(value);
-    
-    return node;
-}
-
-std::shared_ptr<ASTNode> Parser::parseAssignment() {
-    Token name = advance();
-    
-    expect(TokenType::ASSIGN, "Expected '=' after variable name");
-    
-    auto value = parseExpression();
-    
-    expect(TokenType::SEMICOLON, "Expected ';' after assignment");
-    
-    auto node = std::make_shared<ASTNode>(NodeType::ASSIGNMENT, name.value);
     node->children.push_back(value);
     
     return node;
@@ -242,8 +235,10 @@ std::shared_ptr<ASTNode> Parser::parseForLoop() {
     auto condition = parseExpression();
     expect(TokenType::SEMICOLON, "Expected ';' after condition");
     
-    // Update
-    auto update = parseAssignment();
+    // Update - parse as identifier + assignment
+    Token updateName = expect(TokenType::IDENTIFIER, "Expected variable name in update");
+    expect(TokenType::ASSIGN, "Expected '=' in update");
+    auto updateExpr = parseExpression();
     expect(TokenType::RPAREN, "Expected ')' after update");
     
     auto block = parseBlock();
@@ -251,7 +246,11 @@ std::shared_ptr<ASTNode> Parser::parseForLoop() {
     auto node = std::make_shared<ASTNode>(NodeType::FOR_LOOP, "for");
     node->children.push_back(init);
     node->children.push_back(condition);
-    node->children.push_back(update);
+    
+    auto updateNode = std::make_shared<ASTNode>(NodeType::ASSIGNMENT, updateName.value);
+    updateNode->children.push_back(updateExpr);
+    node->children.push_back(updateNode);
+    
     node->children.push_back(block);
     
     return node;
@@ -272,20 +271,7 @@ std::shared_ptr<ASTNode> Parser::parsePrintStatement() {
 }
 
 std::shared_ptr<ASTNode> Parser::parseExpression() {
-    return parseAssignment();
-}
-
-std::shared_ptr<ASTNode> Parser::parseAssignment() {
-    auto expr = parseEquality();
-    
-    if (match({TokenType::ASSIGN})) {
-        auto value = parseAssignment();
-        auto node = std::make_shared<ASTNode>(NodeType::ASSIGNMENT, expr->value);
-        node->children.push_back(value);
-        return node;
-    }
-    
-    return expr;
+    return parseEquality();
 }
 
 std::shared_ptr<ASTNode> Parser::parseEquality() {
@@ -389,6 +375,34 @@ std::shared_ptr<ASTNode> Parser::parsePrimary() {
         return std::make_shared<ASTNode>(NodeType::FUNCTION_CALL, "grohon_shonkhya");
     }
     
+    if (match({TokenType::SHONKOLON, TokenType::BIYOJON, TokenType::GUNON, 
+               TokenType::VABHON, TokenType::MOD, TokenType::SHOMOTA,
+               TokenType::BORO, TokenType::CHOTO})) {
+        std::string funcName = previous().value;
+        expect(TokenType::LPAREN, "Expected '(' after function name");
+        auto left = parseExpression();
+        expect(TokenType::COMMA, "Expected ',' between arguments");
+        auto right = parseExpression();
+        expect(TokenType::RPAREN, "Expected ')' after arguments");
+        
+        // Convert to binary expression
+        std::string op;
+        if (funcName == "shonkolon") op = "+";
+        else if (funcName == "biyojon") op = "-";
+        else if (funcName == "gunon") op = "*";
+        else if (funcName == "vabhon") op = "/";
+        else if (funcName == "mod") op = "%";
+        else if (funcName == "shomota") op = "==";
+        else if (funcName == "boro") op = ">";
+        else if (funcName == "choto") op = "<";
+        else op = funcName;
+        
+        auto node = std::make_shared<ASTNode>(NodeType::BINARY_EXPRESSION, op);
+        node->children.push_back(left);
+        node->children.push_back(right);
+        return node;
+    }
+    
     if (match({TokenType::LPAREN})) {
         auto expr = parseExpression();
         expect(TokenType::RPAREN, "Expected ')' after expression");
@@ -396,22 +410,6 @@ std::shared_ptr<ASTNode> Parser::parsePrimary() {
     }
     
     throw ParserError("Unexpected token in expression: " + peek().value, peek().line, peek().column);
-}
-
-std::shared_ptr<ASTNode> Parser::parseFunctionCall() {
-    Token name = advance();
-    expect(TokenType::LPAREN, "Expected '(' after function name");
-    
-    auto node = std::make_shared<ASTNode>(NodeType::FUNCTION_CALL, name.value);
-    
-    if (!check(TokenType::RPAREN)) {
-        do {
-            node->children.push_back(parseExpression());
-        } while (match({TokenType::COMMA}));
-    }
-    
-    expect(TokenType::RPAREN, "Expected ')' after arguments");
-    return node;
 }
 
 } // namespace chetona
